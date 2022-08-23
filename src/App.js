@@ -18,12 +18,25 @@ function App($app) {
       if (node.type === "DIRECTORY") {
         const nodes = await request(node.id);
         setState({
-          ...this.state,
-          depth: [...this.state.depth, node.name],
+          isRoot: false,
+          depth: [...this.state.depth, node],
           nodes,
         });
       } else if (node.type === "FILE") {
       }
+    },
+    onBackClick: async () => {
+      const isRootNode = this.state.depth.length - 1 === 0 ? true : false;
+      const prevNodeId =
+        this.state.depth.length - 1 === 0
+          ? null
+          : this.state.depth[this.state.depth.length - 2].id;
+      const nodes = await request(prevNodeId);
+      setState({
+        isRoot: isRootNode,
+        depth: this.state.depth.slice(0, this.state.depth.length - 1),
+        nodes,
+      });
     },
   });
 

@@ -1,6 +1,7 @@
 function Nodes({ $app, initialState, onClick, onBackClick }) {
   this.state = initialState;
   this.onClick = onClick;
+  this.onBackClick = onBackClick;
 
   this.$target = document.createElement("ul");
   this.$target.className = "Nodes";
@@ -42,6 +43,10 @@ function Nodes({ $app, initialState, onClick, onBackClick }) {
     this.$target.querySelectorAll(".Node").forEach(($node) => {
       $node.addEventListener("click", (e) => {
         const { nodeId } = e.target.closest(".Node").dataset;
+        if (!nodeId) {
+          this.onBackClick();
+          return;
+        }
         const selectedNode = this.state.nodes.find(
           (node) => node.id === nodeId
         );
