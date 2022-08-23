@@ -1,8 +1,10 @@
 import Breadcrumb from "./components/Breadcrumb.js";
 import Nodes from "./components/Nodes.js";
+import request from "./api/request.js";
 
 function App($app) {
   this.state = {
+    isRoot: false,
     depth: [],
     nodes: [],
   };
@@ -11,30 +13,36 @@ function App($app) {
 
   const nodes = new Nodes({
     $app,
-    initialState: { nodes: this.state.nodes },
+    initialState: this.state,
+    onClick: async (node) => {
+      if (node.type === "DIRECTORY") {
+        const nodes = await request(node.id);
+        setState({
+          ...this.state,
+          depth: [...this.state.depth, node.name],
+          nodes,
+        });
+      } else if (node.type === "FILE") {
+      }
+    },
   });
 
   const setState = (nextState) => {
     this.state = nextState;
     breadcrumb.setState(this.state.depth);
-    nodes.setState({
-      nodes: this.state.nodes,
-    });
+    nodes.setState(this.state);
   };
 
-  setState({
-    depth: ["노란고양이"],
-    nodes: [
-      {
-        name: "2021/04",
-        type: "DIRECTORY",
-      },
-      {
-        name: "하품하는 사진",
-        type: "FILE",
-      },
-    ],
-  });
+  const init = async () => {
+    try {
+      const nodes = await request();
+      setState({ ...this.state, isRoot: true, nodes });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  init();
 }
 
 export default App;

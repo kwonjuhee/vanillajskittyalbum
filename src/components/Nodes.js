@@ -1,5 +1,6 @@
-function Nodes({ $app, initialState }) {
+function Nodes({ $app, initialState, onClick, onBackClick }) {
   this.state = initialState;
+  this.onClick = onClick;
 
   this.$target = document.createElement("ul");
   this.$target.className = "Nodes";
@@ -18,19 +19,35 @@ function Nodes({ $app, initialState }) {
             ? "../../assets/file.png"
             : "../../assets/directory.png";
         return `
-          <div class="Node">
+          <div class="Node" data-node-id="${node.id}">
             <img src="${iconPath}" />
             <div>${node.name}</div>
           </div>
         `;
       })
       .join("");
-    this.$target.innerHTML = `
-      <div class="Node">
-        <img src="../../assets/prev.png" />
-      </div>
-      ${nodesTemplate}
+
+    this.$target.innerHTML = `${
+      this.state.isRoot
+        ? nodesTemplate
+        : `
+          <div class="Node">
+            <img src="../../assets/prev.png" />
+          </div>
+          ${nodesTemplate}
+        `
+    }
     `;
+
+    this.$target.querySelectorAll(".Node").forEach(($node) => {
+      $node.addEventListener("click", (e) => {
+        const { nodeId } = e.target.closest(".Node").dataset;
+        const selectedNode = this.state.nodes.find(
+          (node) => node.id === nodeId
+        );
+        this.onClick(selectedNode);
+      });
+    });
   };
 }
 
