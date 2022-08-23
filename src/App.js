@@ -9,7 +9,18 @@ function App($app) {
     nodes: [],
   };
 
-  const breadcrumb = new Breadcrumb({ $app, initialState: this.state.depth });
+  const breadcrumb = new Breadcrumb({
+    $app,
+    initialState: this.state.depth,
+    onClick: async (index) => {
+      const nodes = await request(this.state.depth[index]?.id);
+      setState({
+        isRoot: index === null,
+        depth: index ? [] : this.state.depth.slice(0, index + 1),
+        nodes,
+      });
+    },
+  });
 
   const nodes = new Nodes({
     $app,
@@ -26,14 +37,13 @@ function App($app) {
       }
     },
     onBackClick: async () => {
-      const isRootNode = this.state.depth.length - 1 === 0 ? true : false;
       const prevNodeId =
         this.state.depth.length - 1 === 0
           ? null
           : this.state.depth[this.state.depth.length - 2].id;
       const nodes = await request(prevNodeId);
       setState({
-        isRoot: isRootNode,
+        isRoot: this.state.depth.length - 1 === 0,
         depth: this.state.depth.slice(0, this.state.depth.length - 1),
         nodes,
       });
