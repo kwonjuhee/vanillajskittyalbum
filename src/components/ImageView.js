@@ -1,8 +1,9 @@
 const IMAGE_PATH_PREFIX =
   "https://fe-dev-matching-2021-03-serverlessdeploymentbuck-t3kpj3way537.s3.ap-northeast-2.amazonaws.com/public";
 
-function ImageView({ $app, initialState }) {
+function ImageView({ $app, initialState, onClose }) {
   this.state = initialState;
+  this.onClose = onClose;
 
   this.$target = document.createElement("div");
   this.$target.className = "Modal ImageViewer";
@@ -21,6 +22,17 @@ function ImageView({ $app, initialState }) {
         ${this.state ? `<img src="${IMAGE_PATH_PREFIX + this.state}" />` : ""}
         </div>
     `;
+
+    this.$target.addEventListener("click", (e) => {
+      if (e.target.classList.contains("ImageViewer")) {
+        this.onClose();
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key !== "Escape") return;
+      this.onClose();
+    });
   };
 }
 

@@ -62,6 +62,14 @@ function App($app) {
   const imageView = new ImageView({
     $app,
     initialState: this.state.selectedFilePath,
+    onClose: () => {
+      if (this.state.selectedFilePath) {
+        setState({
+          ...this.state,
+          selectedFilePath: null,
+        });
+      }
+    },
   });
 
   const setState = (nextState) => {
