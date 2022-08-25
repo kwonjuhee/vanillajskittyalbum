@@ -16,16 +16,38 @@ function App($app) {
     isLoading: false,
   };
 
+  const initNodes = async () => {
+    try {
+      setState({ ...this.state, isLoading: true });
+      const rootNodes = await request();
+      setState({ ...this.state, isRoot: true, nodes: rootNodes });
+      cache.root = rootNodes;
+    } catch (e) {
+      alert(ERROR_MESSAGE);
+    } finally {
+      setState({
+        ...this.state,
+        isLoading: false,
+      });
+    }
+  };
+
   const breadcrumb = new Breadcrumb({
     $app,
     initialState: this.state.depth,
     onClick: (index) => {
-      const nodeId = index === null ? "root" : this.state.depth[index].id;
+      if (
+        this.state.depth.length === 0 ||
+        this.state.depth.length - 1 === index
+      )
+        return;
+      const isRoot = index === "root";
+      const targetNodeId = isRoot ? "root" : this.state.depth[index].id;
       setState({
         ...this.state,
-        isRoot: index === null,
-        depth: index === null ? [] : this.state.depth.slice(0, index + 1),
-        nodes: cache[nodeId],
+        isRoot,
+        depth: isRoot ? [] : this.state.depth.slice(0, index + 1),
+        nodes: cache[targetNodeId],
       });
     },
   });
@@ -36,19 +58,27 @@ function App($app) {
     onClick: async (node) => {
       if (node.type === "DIRECTORY") {
         try {
-          setState({ ...this.state, isLoading: true });
-          let nodes = [];
-          if (cache[node.id]) nodes = cache[node.id];
+          if (cache[node.id])
+            setState({
+              ...this.state,
+              isRoot: false,
+              depth: [...this.state.depth, node],
+              nodes: cache[node.id],
+            });
           else {
-            nodes = await request(node.id);
+            setState({
+              ...this.state,
+              isLoading: true,
+            });
+            const nodes = await request(node.id);
+            setState({
+              ...this.state,
+              isRoot: false,
+              depth: [...this.state.depth, node],
+              nodes,
+            });
             cache[node.id] = nodes;
           }
-          setState({
-            ...this.state,
-            isRoot: false,
-            depth: [...this.state.depth, node],
-            nodes,
-          });
         } catch (e) {
           alert(ERROR_MESSAGE);
         } finally {
@@ -65,14 +95,13 @@ function App($app) {
       }
     },
     onBackClick: () => {
-      const prevNodeId =
-        this.state.depth.length - 1 === 0
-          ? "root"
-          : this.state.depth[this.state.depth.length - 2].id;
+      const lastIndex = this.state.depth.length - 1;
+      const isRoot = lastIndex === 0;
+      const prevNodeId = isRoot ? "root" : this.state.depth[lastIndex - 1].id;
       setState({
         ...this.state,
-        isRoot: this.state.depth.length - 1 === 0,
-        depth: this.state.depth.slice(0, this.state.depth.length - 1),
+        isRoot,
+        depth: this.state.depth.slice(0, lastIndex),
         nodes: cache[prevNodeId],
       });
     },
@@ -101,23 +130,7 @@ function App($app) {
     loading.setState(this.state.isLoading);
   };
 
-  const init = async () => {
-    try {
-      setState({ ...this.state, isLoading: true });
-      const rootNodes = await request();
-      setState({ ...this.state, isRoot: true, nodes: rootNodes });
-      cache.root = rootNodes;
-    } catch (e) {
-      alert(ERROR_MESSAGE);
-    } finally {
-      setState({
-        ...this.state,
-        isLoading: false,
-      });
-    }
-  };
-
-  init();
+  initNodes();
 }
 
 export default App;

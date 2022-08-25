@@ -1,14 +1,14 @@
 function Nodes({ $app, initialState, onClick, onBackClick }) {
-  this.state = initialState;
-  this.onClick = onClick;
-  this.onBackClick = onBackClick;
+  this.init = () => {
+    this.$target = document.createElement("ul");
+    this.$target.className = "Nodes";
+    $app.appendChild(this.$target);
 
-  this.$target = document.createElement("ul");
-  this.$target.className = "Nodes";
-  $app.appendChild(this.$target);
+    this.state = initialState;
+    this.onClick = onClick;
+    this.onBackClick = onBackClick;
 
-  this.setState = (nextState) => {
-    this.state = nextState;
+    this.setEvent();
     this.render();
   };
 
@@ -41,18 +41,28 @@ function Nodes({ $app, initialState, onClick, onBackClick }) {
     `;
   };
 
-  this.$target.addEventListener("click", (e) => {
-    const $Node = e.target.closest(".Node");
-    if (!$Node) return;
+  this.setEvent = () => {
+    this.$target.addEventListener("click", (e) => {
+      const $Node = e.target.closest(".Node");
+      if (!$Node) return;
 
-    const { nodeId } = $Node.dataset;
-    if (!nodeId) {
-      this.onBackClick();
-      return;
-    }
-    const selectedNode = this.state.nodes.find((node) => node.id === nodeId);
-    this.onClick(selectedNode);
-  });
+      const nodeId = $Node.dataset.nodeId;
+      if (!nodeId) this.onBackClick();
+      else {
+        const selectedNode = this.state.nodes.find(
+          (node) => node.id === nodeId
+        );
+        this.onClick(selectedNode);
+      }
+    });
+  };
+
+  this.setState = (nextState) => {
+    this.state = nextState;
+    this.render();
+  };
+
+  this.init();
 }
 
 export default Nodes;

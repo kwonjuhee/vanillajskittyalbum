@@ -1,13 +1,13 @@
 function Breadcrumb({ $app, initialState, onClick }) {
-  this.state = initialState;
-  this.onClick = onClick;
+  this.init = () => {
+    this.$target = document.createElement("nav");
+    this.$target.className = "Breadcrumb";
+    $app.appendChild(this.$target);
 
-  this.$target = document.createElement("nav");
-  this.$target.className = "Breadcrumb";
-  $app.appendChild(this.$target);
+    this.state = initialState;
+    this.onClick = onClick;
 
-  this.setState = (nextState) => {
-    this.state = nextState;
+    this.setEvent();
     this.render();
   };
 
@@ -20,13 +20,22 @@ function Breadcrumb({ $app, initialState, onClick }) {
       .join("")}`;
   };
 
-  this.$target.addEventListener("click", (e) => {
-    const $navItem = e.target.closest(".nav-item");
-    if (!$navItem) return;
+  this.setEvent = () => {
+    this.$target.addEventListener("click", (e) => {
+      const $navItem = e.target.closest(".nav-item");
+      if (!$navItem) return;
 
-    const { index } = $navItem.dataset;
-    this.onClick(index ? +index : null);
-  });
+      const index = $navItem.dataset.index;
+      this.onClick(index ? +index : "root");
+    });
+  };
+
+  this.setState = (nextState) => {
+    this.state = nextState;
+    this.render();
+  };
+
+  this.init();
 }
 
 export default Breadcrumb;

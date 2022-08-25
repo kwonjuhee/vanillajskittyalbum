@@ -1,13 +1,12 @@
 function Loading({ $app, initialState }) {
-  this.state = initialState;
+  this.init = () => {
+    this.$target = document.createElement("div");
+    this.$target.className = "Modal loading";
+    this.$target.style.display = "none";
+    $app.appendChild(this.$target);
 
-  this.$target = document.createElement("div");
-  this.$target.className = "Modal loading";
-  this.$target.style.display = "none";
-  $app.appendChild(this.$target);
+    this.state = initialState;
 
-  this.setState = (nextState) => {
-    this.state = nextState;
     this.render();
   };
 
@@ -19,6 +18,13 @@ function Loading({ $app, initialState }) {
     `;
     this.$target.style.display = this.state ? "block" : "none";
   };
+
+  this.setState = (nextState) => {
+    this.state = nextState;
+    this.render();
+  };
+
+  this.init();
 }
 
 export default Loading;
