@@ -5,9 +5,9 @@ const request = async (nodeId) => {
   try {
     const response = await fetch(`${API_END_POINT}/${nodeId ?? ""}`);
     if (!response.ok) throw new Error();
-    return await response.json();
+    return response.json();
   } catch (e) {
-    throw new Error();
+    throw new Error(e);
   }
 };
 
