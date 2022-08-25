@@ -21,7 +21,10 @@ function Breadcrumb({ $app, initialState, onClick }) {
   };
 
   this.$target.addEventListener("click", (e) => {
-    const { index } = e.target.closest(".nav-item").dataset;
+    const $navItem = e.target.closest(".nav-item");
+    if (!$navItem) return;
+
+    const { index } = $navItem.dataset;
     this.onClick(index ? +index : null);
   });
 }

@@ -42,7 +42,10 @@ function Nodes({ $app, initialState, onClick, onBackClick }) {
   };
 
   this.$target.addEventListener("click", (e) => {
-    const { nodeId } = e.target.closest(".Node").dataset;
+    const $Node = e.target.closest(".Node");
+    if (!$Node) return;
+
+    const { nodeId } = $Node.dataset;
     if (!nodeId) {
       this.onBackClick();
       return;
