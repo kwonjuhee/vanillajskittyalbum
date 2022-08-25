@@ -18,14 +18,12 @@ function Breadcrumb({ $app, initialState, onClick }) {
           `<div class="nav-item" data-index="${index}">${node.name}</div>`
       )
       .join("")}`;
-
-    this.$target.querySelectorAll(".nav-item").forEach(($item) => {
-      $item.addEventListener("click", (e) => {
-        const { index } = e.target.dataset;
-        this.onClick(index ? +index : null);
-      });
-    });
   };
+
+  this.$target.addEventListener("click", (e) => {
+    const { index } = e.target.closest(".nav-item").dataset;
+    this.onClick(index ? +index : null);
+  });
 }
 
 export default Breadcrumb;

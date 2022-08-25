@@ -39,21 +39,17 @@ function Nodes({ $app, initialState, onClick, onBackClick }) {
         `
     }
     `;
-
-    this.$target.querySelectorAll(".Node").forEach(($node) => {
-      $node.addEventListener("click", (e) => {
-        const { nodeId } = e.target.closest(".Node").dataset;
-        if (!nodeId) {
-          this.onBackClick();
-          return;
-        }
-        const selectedNode = this.state.nodes.find(
-          (node) => node.id === nodeId
-        );
-        this.onClick(selectedNode);
-      });
-    });
   };
+
+  this.$target.addEventListener("click", (e) => {
+    const { nodeId } = e.target.closest(".Node").dataset;
+    if (!nodeId) {
+      this.onBackClick();
+      return;
+    }
+    const selectedNode = this.state.nodes.find((node) => node.id === nodeId);
+    this.onClick(selectedNode);
+  });
 }
 
 export default Nodes;
